@@ -3,12 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
+using Image = UnityEngine.UI.Image;
 
 public class PlayerController : MonoBehaviour {
 	public Camera mainCamera;
 	public Rigidbody2D rigidBody;
+	public string entityName;
+	public int defaultHp;
+	public int defaultAtk;
+	public int defaultDef;
 	public float maxSpeed = 10f;
+	public Text playerGui;
+	public Text HpOut;
+	public Image HpBar;
 
 	private Vector2 directionOfTravel = Vector3.zero;
 	private float rotationSpeed = 1f;
@@ -22,12 +31,15 @@ public class PlayerController : MonoBehaviour {
 	private Vector2 end;
 	private Vector2 force;
 
+	private Entity entity;
+
 	void Start() {
 		start = new Vector2();
 		end = new Vector2();
 		force = new Vector2();
 		rigidBody = GetComponent<Rigidbody2D>();
 		oldPosition = transform.position.x;
+		entity = new Entity(entityName, defaultHp, defaultAtk, defaultDef);
 	}
 
 	void Update() {
@@ -59,9 +71,30 @@ public class PlayerController : MonoBehaviour {
 		if (rigidBody.velocity.magnitude > maxSpeed) {
 			rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
 		}
+
+		playerGui.text = entity.name + "\n=============\n" + entity.statsToString();
+		HpOut.text = "HP: " + entity.currHP + " / " + entity.HP;
+		HpBar.fillAmount = entity.currHP / 100f;
+		if (Input.GetButton("Jump")) {
+			entity.currHP -= 1;
+		}
+
+		if (entity.currHP == 0) {
+			entity.currHP = 100;
+		}
 	}
 
-	//mainCamera.ScreenToViewportPoint(Input.mousePosition)
+	void OnTriggerEnter2D(Collider2D other) {
+		print("Collision Detected");
+		if (other.gameObject.CompareTag("Hurt")) {
+			entity.currHP -= 10;
+		}
+
+		// if (other.gameObject.name == "FinishLine")
+		// {
+		// 	Debug.Log("Finish Line2");
+		// }
+	}
 
 	void DrawLine(Vector2 start, Vector2 end, Color color, float duration = 1f) {
 		float PercentHead = 0.2f;
