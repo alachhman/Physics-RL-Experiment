@@ -2,8 +2,8 @@
 
 public class HomingProjectileController : MonoBehaviour {
 	[SerializeField] Transform Target;
-	[SerializeField] float MoveSpeedFloor = 1300f;
-	[SerializeField] float MoveSpeedCieling = 1500f;
+	[SerializeField] float MoveSpeedFloor = 1400f;
+	[SerializeField] float MoveSpeedCieling = 1900f;
 	[SerializeField] float RotateSpeedfloor = 8000f;
 	[SerializeField] float RotateSpeedCieling = 17000f;
 	private float MoveSpeed;
