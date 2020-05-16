@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class HomingProjectileController : MonoBehaviour {
-	[SerializeField] Transform Target;
+	private Transform Target;
+	public ParticleSystem deathAnim;
 	[SerializeField] float MoveSpeedFloor = 1400f;
 	[SerializeField] float MoveSpeedCieling = 1900f;
 	[SerializeField] float RotateSpeedfloor = 8000f;
@@ -16,11 +19,12 @@ public class HomingProjectileController : MonoBehaviour {
 		RotateSpeed = Random.Range(RotateSpeedfloor, RotateSpeedCieling);
 		rb = GetComponent<Rigidbody2D>();
 		rb.gravityScale = 0;
+		Target = GameObject.Find("Player").transform;
 	}
 
 	// Update is called once per frame
 	void Update() {
-		rb.velocity = transform.up * MoveSpeed * Time.deltaTime;
+		rb.velocity = transform.up * (MoveSpeed * Time.deltaTime);
 
 		Vector3 targetVector = Target.position - transform.position;
 
@@ -28,4 +32,10 @@ public class HomingProjectileController : MonoBehaviour {
 
 		rb.angularVelocity = -1 * rotatingIndex * RotateSpeed * Time.deltaTime;
 	}
+
+	private void OnDisable() {
+		Instantiate(deathAnim, gameObject.transform);
+	}
+	
+	
 }

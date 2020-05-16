@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour {
 	public Camera mainCamera;
@@ -18,6 +20,7 @@ public class PlayerController : MonoBehaviour {
 	public Text playerGui;
 	public Text HpOut;
 	public Image HpBar;
+	public GameObject damageNumber;
 
 	private Vector2 directionOfTravel = Vector3.zero;
 	private float rotationSpeed = 1f;
@@ -74,10 +77,7 @@ public class PlayerController : MonoBehaviour {
 
 		playerGui.text = entity.name + "\n=============\n" + entity.statsToString();
 		HpOut.text = "HP: " + entity.currHP + " / " + entity.HP;
-		HpBar.fillAmount = entity.currHP / 100f;
-		if (Input.GetButton("Jump")) {
-			entity.currHP -= 1;
-		}
+		HpBar.fillAmount = (float)entity.currHP / entity.HP;
 
 		if (entity.currHP == 0) {
 			entity.currHP = 100;
@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other) {
 		print("Collision Detected");
 		if (other.gameObject.CompareTag("Hurt")) {
-			entity.currHP -= 10;
+			takeDamage(Random.Range(1,100));
 		}
 
 		// if (other.gameObject.name == "FinishLine")
@@ -122,5 +122,14 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		return null;
+	}
+
+	void takeDamage(int damage) {
+		entity.currHP -= damage;
+		GameObject dpsOut = Instantiate(damageNumber,
+			new Vector3(transform.position.x + Random.Range(-0.5f, 0.5f),
+				transform.position.y + Random.Range(-0.5f, 0.5f), transform.position.z), transform.rotation);
+		dpsOut.GetComponent<Text>().text = damage.ToString();
+		dpsOut.GetComponent<Text>().color = Color.red;
 	}
 }

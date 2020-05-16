@@ -9,9 +9,11 @@
         <e p="Resources" t="Include">
           <e p="Scripts" t="Include">
             <e p="CameraController.cs" t="Include" />
+            <e p="DamageNumberHandler.cs" t="Include" />
             <e p="Entity.cs" t="Include" />
             <e p="HomingProjectileController.cs" t="Include" />
             <e p="playerController.cs" t="Include" />
+            <e p="RocketLauncherEnemyController.cs" t="Include" />
           </e>
         </e>
       </e>
