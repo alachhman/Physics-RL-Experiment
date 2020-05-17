@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class RocketLauncherEnemyController : MonoBehaviour {
 	private CircleCollider2D detectionRadius;
@@ -9,10 +11,23 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 	public int lifeTime;
 	private ParticleSystem particles;
 	private GameObject activeAmmo;
+	private bool isAlive;
+	public string entityName;
+	public int defaultHp;
+	public int defaultAtk;
+	public int defaultDef;
+	public Entity entity;
+	public Image HPBar;
+	private GameObject goldIndicator;
+	private bool hasGivenReward;
 
 	// Start is called before the first frame update
 	void Start() {
 		detectionRadius = gameObject.GetComponent<CircleCollider2D>();
+		entity = new Entity(entityName, defaultHp, defaultAtk, defaultDef);
+		isAlive = true;
+		goldIndicator = GameObject.Find("GoldText");
+		hasGivenReward = false;
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) {
@@ -23,13 +38,27 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 		emitRocket(other);
 	}
 
-	private void Update() { }
+	private void Update() {
+		HPBar.fillAmount = (float)entity.currHP / entity.HP;
+		if (entity.currHP < 0) {
+			isAlive = false;
+			if (!hasGivenReward) {
+				goldIndicator.GetComponent<Text>().text =
+                				(int.Parse(goldIndicator.GetComponent<Text>().text) + Random.Range(20, 50)).ToString();
+				hasGivenReward = true;
+			}
+			StartCoroutine(tearDownMissile(activeAmmo, 0));
+			StartCoroutine(FadeTo(0f, 1f, gameObject));
+		}
+	}
 
 	void emitRocket(Collider2D other) {
 		if (activeAmmo) {
 			return;
 		}
-
+		if (!isAlive) {
+			return;
+		}
 		if (other.gameObject.CompareTag("Player")) {
 			print("Player detected");
 			GameObject newAmmo = Instantiate(ammo,
@@ -37,13 +66,13 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 			activeAmmo = newAmmo;
 		}
 
-		StartCoroutine(tearDownMissile(activeAmmo));
+		StartCoroutine(tearDownMissile(activeAmmo, lifeTime));
 	}
 
-	private IEnumerator tearDownMissile(GameObject currMissile) {
-		yield return new WaitForSeconds(lifeTime);
+	private IEnumerator tearDownMissile(GameObject currMissile, int lifetime) {
+		yield return new WaitForSeconds(lifetime);
 		currMissile.GetComponentInChildren<ParticleSystem>().Stop();
-		StartCoroutine(FadeTo(0f, 0.5f, currMissile));
+		StartCoroutine(FadeTo(0f, 0.2f, currMissile));
 	}
 	
 	IEnumerator FadeTo(float aValue, float aTime, GameObject gameObject)
@@ -58,4 +87,5 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 		}
 		Destroy(gameObject);
 	}
+	
 }

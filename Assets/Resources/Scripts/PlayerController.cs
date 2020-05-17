@@ -87,13 +87,14 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other) {
 		print("Collision Detected");
 		if (other.gameObject.CompareTag("Hurt")) {
-			takeDamage(Random.Range(1,100));
+			takeDamage(Random.Range(1,100), Color.red);
 		}
+	}
 
-		// if (other.gameObject.name == "FinishLine")
-		// {
-		// 	Debug.Log("Finish Line2");
-		// }
+	private void OnCollisionEnter2D(Collision2D other) {
+		if (other.gameObject.CompareTag("Enemy")) {
+			dealDamage(other.gameObject,(Mathf.RoundToInt(rigidBody.velocity.magnitude * 2) + entity.currATK), Color.yellow);
+		}
 	}
 
 	void DrawLine(Vector2 start, Vector2 end, Color color, float duration = 1f) {
@@ -109,7 +110,7 @@ public class PlayerController : MonoBehaviour {
 		lr.endColor = Color.red;
 		lr.SetPosition(0, start);
 		lr.SetPosition(1, end);
-		GameObject.Destroy(myLine, duration);
+		Destroy(myLine, duration);
 	}
 
 	private Vector3? GetCurrentMousePosition() {
@@ -124,12 +125,22 @@ public class PlayerController : MonoBehaviour {
 		return null;
 	}
 
-	void takeDamage(int damage) {
+	void takeDamage(int damage, Color color) {
 		entity.currHP -= damage;
 		GameObject dpsOut = Instantiate(damageNumber,
 			new Vector3(transform.position.x + Random.Range(-0.5f, 0.5f),
 				transform.position.y + Random.Range(-0.5f, 0.5f), transform.position.z), transform.rotation);
 		dpsOut.GetComponent<Text>().text = damage.ToString();
-		dpsOut.GetComponent<Text>().color = Color.red;
+		dpsOut.GetComponent<Text>().color = color;
+	}
+
+	void dealDamage(GameObject enemy, int damage, Color color) {
+		enemy.GetComponent<RocketLauncherEnemyController>().entity.currHP -= damage;
+		GameObject dpsOut = Instantiate(damageNumber,
+			new Vector3(enemy.transform.position.x + Random.Range(-0.5f, 0.5f),
+				enemy.transform.position.y + Random.Range(-0.5f, 0.5f), enemy.transform.position.z + 10), enemy.transform.rotation);
+		dpsOut.transform.localRotation = Quaternion.identity;
+		dpsOut.GetComponent<Text>().text = damage.ToString();
+		dpsOut.GetComponent<Text>().color = color;
 	}
 }
