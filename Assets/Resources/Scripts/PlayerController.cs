@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour {
 	public Text HpOut;
 	public Image HpBar;
 	public GameObject damageNumber;
+	private Animator animator;
 
 	private Vector2 directionOfTravel = Vector3.zero;
 	private float rotationSpeed = 1f;
@@ -43,11 +44,13 @@ public class PlayerController : MonoBehaviour {
 		rigidBody = GetComponent<Rigidbody2D>();
 		oldPosition = transform.position.x;
 		entity = new Entity(entityName, defaultHp, defaultAtk, defaultDef);
+		animator = gameObject.GetComponent<Animator>();
 	}
 
 	void Update() {
 		if (Input.GetMouseButtonDown(0)) start = GetCurrentMousePosition().GetValueOrDefault();
 		else if (Input.GetMouseButtonUp(0)) {
+			StartCoroutine(waitForAnimationFinish());
 			end = GetCurrentMousePosition().GetValueOrDefault();
 			force = end - start;
 			// print(force.magnitude);
@@ -69,7 +72,7 @@ public class PlayerController : MonoBehaviour {
 			transform.rotation = Quaternion.Euler(transform.rotation.x, 180, transform.rotation.z);
 		}
 
-		oldPosition = transform.position.y;
+		oldPosition = transform.position.x;
 
 		if (rigidBody.velocity.magnitude > maxSpeed) {
 			rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
@@ -77,7 +80,7 @@ public class PlayerController : MonoBehaviour {
 
 		playerGui.text = entity.name + "\n=============\n" + entity.statsToString();
 		HpOut.text = "HP: " + entity.currHP + " / " + entity.HP;
-		HpBar.fillAmount = (float)entity.currHP / entity.HP;
+		HpBar.fillAmount = (float) entity.currHP / entity.HP;
 
 		if (entity.currHP == 0) {
 			entity.currHP = 100;
@@ -87,13 +90,14 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other) {
 		print("Collision Detected");
 		if (other.gameObject.CompareTag("Hurt")) {
-			takeDamage(Random.Range(1,100), Color.red);
+			takeDamage(Random.Range(1, 100), Color.red);
 		}
 	}
 
 	private void OnCollisionEnter2D(Collision2D other) {
 		if (other.gameObject.CompareTag("Enemy")) {
-			dealDamage(other.gameObject,(Mathf.RoundToInt(rigidBody.velocity.magnitude * 2) + entity.currATK), Color.yellow);
+			dealDamage(other.gameObject, (Mathf.RoundToInt(rigidBody.velocity.magnitude * 2) + entity.currATK),
+				Color.yellow);
 		}
 	}
 
@@ -138,9 +142,16 @@ public class PlayerController : MonoBehaviour {
 		enemy.GetComponent<RocketLauncherEnemyController>().entity.currHP -= damage;
 		GameObject dpsOut = Instantiate(damageNumber,
 			new Vector3(enemy.transform.position.x + Random.Range(-0.5f, 0.5f),
-				enemy.transform.position.y + Random.Range(-0.5f, 0.5f), enemy.transform.position.z + 10), enemy.transform.rotation);
+				enemy.transform.position.y + Random.Range(-0.5f, 0.5f), enemy.transform.position.z + 10),
+			enemy.transform.rotation);
 		dpsOut.transform.localRotation = Quaternion.identity;
 		dpsOut.GetComponent<Text>().text = damage.ToString();
 		dpsOut.GetComponent<Text>().color = color;
+	}
+
+	IEnumerator waitForAnimationFinish() {
+		animator.SetBool("attackPerformed", true);
+		yield return new WaitForSeconds(2);
+		animator.SetBool("attackPerformed", false);
 	}
 }
