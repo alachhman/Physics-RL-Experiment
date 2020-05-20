@@ -13,6 +13,7 @@
             <e p="Entity.cs" t="Include" />
             <e p="HomingProjectileController.cs" t="Include" />
             <e p="LockRotation.cs" t="Include" />
+            <e p="ParalaxController.cs" t="Include" />
             <e p="playerController.cs" t="Include" />
             <e p="RocketLauncherEnemyController.cs" t="Include" />
           </e>

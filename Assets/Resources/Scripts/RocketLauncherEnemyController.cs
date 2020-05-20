@@ -20,6 +20,7 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 	public Image HPBar;
 	private GameObject goldIndicator;
 	private bool hasGivenReward;
+	private Rigidbody2D rigidBody;
 
 	// Start is called before the first frame update
 	void Start() {
@@ -28,6 +29,7 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 		isAlive = true;
 		goldIndicator = GameObject.Find("GoldText");
 		hasGivenReward = false;
+		rigidBody = gameObject.GetComponent<Rigidbody2D>();
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) {
@@ -49,6 +51,10 @@ public class RocketLauncherEnemyController : MonoBehaviour {
 			}
 			StartCoroutine(tearDownMissile(activeAmmo, 0));
 			StartCoroutine(FadeTo(0f, 1f, gameObject));
+		}
+		
+		if (rigidBody.velocity.magnitude > 10) {
+			rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, 10);
 		}
 	}
 

@@ -114,6 +114,7 @@ public class PlayerController : MonoBehaviour {
 		lr.endColor = Color.red;
 		lr.SetPosition(0, start);
 		lr.SetPosition(1, end);
+		lr.sortingOrder = 0;
 		Destroy(myLine, duration);
 	}
 
@@ -134,6 +135,7 @@ public class PlayerController : MonoBehaviour {
 		GameObject dpsOut = Instantiate(damageNumber,
 			new Vector3(transform.position.x + Random.Range(-0.5f, 0.5f),
 				transform.position.y + Random.Range(-0.5f, 0.5f), transform.position.z), transform.rotation);
+		dpsOut.transform.localRotation = Quaternion.identity;
 		dpsOut.GetComponent<Text>().text = damage.ToString();
 		dpsOut.GetComponent<Text>().color = color;
 	}

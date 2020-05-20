@@ -49,8 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deathAnim: {fileID: 8176848569175543218, guid: b4aa08cb687ab0c4aa1f4bb081fb4921,
     type: 3}
-  MoveSpeedFloor: 1300
-  MoveSpeedCieling: 1800
+  MoveSpeedFloor: 800
+  MoveSpeedCieling: 900
   RotateSpeedfloor: 13000
   RotateSpeedCieling: 17000
 --- !u!212 &3677826913474788882
